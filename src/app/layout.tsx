@@ -1,0 +1,34 @@
+﻿import type { Metadata } from "next";
+import { Manrope, Space_Grotesk } from "next/font/google";
+import { Toaster } from "sonner";
+import "./globals.css";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
+
+export const metadata: Metadata = {
+  title: "SmartCoIHA",
+  description: "Secure Healthcare Administration",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${manrope.variable} ${spaceGrotesk.variable} antialiased`}>
+        {children}
+        <Toaster position="top-right" richColors closeButton />
+      </body>
+    </html>
+  );
+}
