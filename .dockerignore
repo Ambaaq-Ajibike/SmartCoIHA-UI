@@ -1,0 +1,16 @@
+.git
+.husky
+.next
+node_modules
+coverage
+build
+out
+.vercel
+.env*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+Dockerfile
+docker-compose*.yml
