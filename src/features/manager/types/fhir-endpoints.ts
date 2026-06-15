@@ -32,8 +32,7 @@ export const upsertFhirEndpointSchema = z.object({
   testingPatientId: z
     .string()
     .trim()
-    .min(1, "Testing patient ID is required.")
-    .uuid("Testing patient ID must be a valid UUID."),
+    .min(1, "Testing patient ID is required."),
   supportedResources: z
     .array(resourceTypeEnum)
     .min(1, "Select at least one supported resource."),
