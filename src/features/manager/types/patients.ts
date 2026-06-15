@@ -3,7 +3,7 @@ import { z } from "zod";
 export type EnrollmentStatus = "Pending" | "Verified" | "Failed" | "Denied";
 
 export interface Patient {
-  institutePatientId: string,
+  institutePatientId: string;
   name: string;
   email: string;
   institution: string;

@@ -21,10 +21,7 @@ export async function getPatients(institutionId: string): Promise<Patient[]> {
     );
 
     const data = Array.isArray(response?.data) ? response.data : [];
-    return data.map((patient) => ({
-      ...patient,
-      enrollmentStatus: normalizeEnrollmentStatus(patient.enrollmentStatus),
-    }));
+    return data.map((patient) => normalizePatient(patient as unknown as Record<string, unknown>));
   } catch (error) {
     throw new Error(getApiErrorMessage(error));
   }
@@ -89,15 +86,39 @@ export async function uploadPatientsCsv(institutionId: string, file: File): Prom
   }
 }
 
+function normalizePatient(patient: Record<string, unknown>): Patient {
+  return {
+    institutePatientId:
+      getStringValue(patient, "institutePatientId")
+      ?? getStringValue(patient, "institutionPatientId")
+      ?? "",
+    name: getStringValue(patient, "name") ?? "",
+    email: getStringValue(patient, "email") ?? "",
+    institution: getStringValue(patient, "institution") ?? "",
+    enrollmentStatus: normalizeEnrollmentStatus(patient.enrollmentStatus),
+  };
+}
+
 function normalizeEnrollmentStatus(value: unknown): EnrollmentStatus {
   if (typeof value === "string") {
     const normalized = value.trim().toLowerCase();
+    if (normalized === "pending") return "Pending";
     if (normalized === "verified") return "Verified";
     if (normalized === "failed") return "Failed";
     if (normalized === "denied") return "Denied";
   }
 
   return "Pending";
+}
+
+function getStringValue(source: Record<string, unknown>, key: string): string | undefined {
+  const value = source[key];
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed || undefined;
 }
 
 function getFileNameFromHeader(dispositionHeader?: string): string {

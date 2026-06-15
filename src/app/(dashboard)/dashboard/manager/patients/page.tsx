@@ -53,39 +53,53 @@ export default function ManagerPatientsPage() {
     },
   });
 
-  const columns = useMemo<DataTableColumn<Patient>[]>(() => {
-    if (patients.length === 0) return [];
+  const displayPatients = useMemo(
+    () =>
+      patients.map((patient) => ({
+        ...patient,
+        institution: getInstitutionDisplayName(patient.institution, user?.institutionName),
+      })),
+    [patients, user?.institutionName],
+  );
 
-    return Object.keys(patients[0]).map((key) => {
-      if (key === "name") {
-        return {
-          key,
-          className: "font-medium text-ink",
-        } satisfies DataTableColumn<Patient>;
-      }
-
-      if (key === "enrollmentStatus") {
-        return {
-          key,
-          header: "Enrollment Status",
-          render: (value: unknown) => {
-            const status = String(value ?? "Pending");
-            return (
-              <span
-                className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusClasses(
-                  status,
-                )}`}
-              >
-                {status}
-              </span>
-            );
-          },
-        } satisfies DataTableColumn<Patient>;
-      }
-
-      return { key } satisfies DataTableColumn<Patient>;
-    });
-  }, [patients]);
+  const columns = useMemo<DataTableColumn<Patient>[]>(
+    () => [
+      {
+        key: "institutePatientId",
+        header: "Institute Patient ID",
+      },
+      {
+        key: "name",
+        header: "Name",
+        className: "font-medium text-ink",
+      },
+      {
+        key: "email",
+        header: "Email",
+      },
+      {
+        key: "institution",
+        header: "Institution",
+      },
+      {
+        key: "enrollmentStatus",
+        header: "Enrollment Status",
+        render: (value: unknown) => {
+          const status = String(value ?? "Pending");
+          return (
+            <span
+              className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusClasses(
+                status,
+              )}`}
+            >
+              {status}
+            </span>
+          );
+        },
+      },
+    ],
+    [],
+  );
 
   const loadPatients = useCallback(async (refresh = false) => {
     if (!institutionId) {
@@ -241,9 +255,9 @@ export default function ManagerPatientsPage() {
         </div>
       ) : (
         <DataTable
-          data={patients}
+          data={displayPatients}
           columns={columns}
-          rowKey={(row) => `${row.email}-${row.name}`}
+          rowKey={(row) => row.institutePatientId || `${row.email}-${row.name}`}
           emptyMessage="No patients found for this institution."
         />
       )}
@@ -386,4 +400,13 @@ function getStatusClasses(status: string) {
   if (status === "Failed") return "bg-amber-100 text-amber-800";
   if (status === "Denied") return "bg-red-100 text-red-700";
   return "bg-slate-100 text-slate-700";
+}
+
+function getInstitutionDisplayName(institution: string, fallback?: string | null) {
+  const normalized = institution.trim();
+  if (normalized && normalized.toLowerCase() !== "unknown") {
+    return normalized;
+  }
+
+  return fallback?.trim() || "-";
 }
