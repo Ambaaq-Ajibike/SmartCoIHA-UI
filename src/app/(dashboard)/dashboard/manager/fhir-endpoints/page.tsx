@@ -207,12 +207,12 @@ export default function ManagerFhirEndpointsPage() {
 
           <div>
             <label htmlFor="testingPatientId" className="text-sm font-medium text-ink">
-              Testing Patient ID (UUID)
+              Testing Patient ID 
             </label>
             <input
               id="testingPatientId"
               type="text"
-              placeholder="3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              placeholder="....."
               className={fieldClassName}
               {...register("testingPatientId")}
             />
